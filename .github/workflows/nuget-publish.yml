@@ -6,9 +6,6 @@ on:
       project-path:
         required: true
         type: string
-      version:
-        required: true
-        type: string          # e.g. "1.2.3" — you pass this from the project's publish.yml
     secrets:
       NUGET_API_KEY:
         required: true
@@ -38,15 +35,21 @@ jobs:
             echo "No test project found."
           fi
 
+      - name: Read version from csproj
+        id: read_version
+        run: |
+          VERSION=$(grep -oP '(?<=<Version>)[^<]+' ${{ inputs.project-path }})
+          FULL_VERSION="$VERSION.${{ github.run_number }}"
+          echo "Full version: $FULL_VERSION"
+          echo "full_version=$FULL_VERSION" >> $GITHUB_OUTPUT
+
       - name: Pack
         run: |
-          FULL_VERSION="${{ inputs.version }}.${{ github.run_number }}"
-          echo "Packing version $FULL_VERSION"
           dotnet pack ${{ inputs.project-path }} \
             --configuration Release \
             --no-build \
             --output ./artifacts \
-            /p:Version=$FULL_VERSION
+            /p:Version=${{ steps.read_version.outputs.full_version }}
 
       - name: Publish
         run: |
