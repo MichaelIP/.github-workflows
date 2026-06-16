@@ -39,9 +39,8 @@ jobs:
         id: read_version
         run: |
           VERSION=$(grep -oP '(?<=<Version>)[^<]+' ${{ inputs.project-path }})
-          FULL_VERSION="$VERSION.${{ github.run_number }}"
-          echo "Full version: $FULL_VERSION"
-          echo "full_version=$FULL_VERSION" >> $GITHUB_OUTPUT
+          echo "Full version: $VERSION"
+          echo "full_version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Pack
         run: |
